@@ -202,7 +202,7 @@ const Costumes = () => {
     }
     localStorage.getItem("username") &&
       setUserState({ username: localStorage.getItem("username") });
-  }, []);
+  }, [navigate]);
 
   const confirmDelete = (id) => {
     Modal.confirm({
