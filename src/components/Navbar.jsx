@@ -1,35 +1,122 @@
-import { useState, useEffect } from "react";
-import { Dropdown, Menu, Button } from "antd";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
-import { logout } from "../api/authApi";
+// Navbar.jsx
+import { Layout, Menu, Dropdown, Button, Drawer } from "antd";
+import {
+  UserOutlined,
+  LogoutOutlined,
+  FileImageOutlined,
+  SkinOutlined,
+  TagOutlined,
+  MenuOutlined,
+} from "@ant-design/icons";
+import { Link, useLocation } from "react-router-dom";
 
-const Navbar = () => {
-  const [username, setUsername] = useState("");
+const { Header } = Layout;
 
-  useEffect(() => {
-    setUsername(localStorage.getItem("username") || "ผู้ใช้");
-  }, []);
-
-  const handleLogout = async () => {
-    await logout();
-    localStorage.clear();
-    toast.success("ออกจากระบบสำเร็จ");
-    window.location.href = "/login";
+const Navbar = ({
+  username,
+  onLogout,
+  onMenuClick,
+  isDrawerOpen,
+  onCloseDrawer,
+}) => {
+  const location = useLocation();
+  const pathToKeyMap = {
+    "/admin/costumes": "costumes",
+    "/admin/costumes/status": "costume-status",
+    "/admin/images": "images",
   };
-
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
-        ออกจากระบบ
-      </Menu.Item>
-    </Menu>
-  );
+  const currentKey = pathToKeyMap[location.pathname] || "costumes";
 
   return (
-    <Dropdown overlay={userMenu} trigger={["click"]}>
-      <Button icon={<UserOutlined />}>{username}</Button>{" "}
-      {/* ✅ เปลี่ยนเป็นชื่อจริง */}
-    </Dropdown>
+    <Header
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        background: "#fff",
+        padding: "0 20px",
+      }}
+    >
+      {/* ปุ่มเมนูสำหรับมือถือ */}
+      <Button
+        type="text"
+        icon={<MenuOutlined />}
+        onClick={onMenuClick}
+        style={{ display: "none", fontSize: "20px" }}
+        className="menu-button"
+      />
+
+      <h2 style={{ textAlign: "center", fontWeight: "bold" }}>Moso-Yodia</h2>
+      <Menu
+        mode="horizontal"
+        selectedKeys={[currentKey]}
+        style={{ flex: 1, justifyContent: "center" }}
+        className="desktop-menu"
+        items={[
+          {
+            key: "costumes",
+            icon: <SkinOutlined />,
+            label: <Link to="/admin/costumes">จัดการชุด</Link>,
+          },
+          {
+            key: "costume-status",
+            icon: <TagOutlined />,
+            label: <Link to="/admin/costumes/status">จัดการสถานะชุด</Link>,
+          },
+          {
+            key: "images",
+            icon: <FileImageOutlined />,
+            label: <Link to="/admin/images">จัดการรูปภาพ</Link>,
+          },
+        ]}
+      />
+      {/* ใช้ menu แทน overlay */}
+      <Dropdown
+        menu={{
+          items: [
+            {
+              key: "logout",
+              label: "ออกจากระบบ",
+              icon: <LogoutOutlined />,
+              onClick: onLogout,
+            },
+          ],
+        }}
+        trigger={["click"]}
+      >
+        <Button icon={<UserOutlined />}>{username}</Button>
+      </Dropdown>
+
+      {/* Drawer สำหรับมือถือ */}
+      <Drawer
+        title="เมนู"
+        placement="left"
+        onClose={onCloseDrawer}
+        open={isDrawerOpen}
+      >
+        <Menu
+          mode="vertical"
+          selectedKeys={[currentKey]}
+          items={[
+            {
+              key: "costumes",
+              icon: <SkinOutlined />,
+              label: <Link to="/admin/costumes">จัดการชุด</Link>,
+            },
+            {
+              key: "costume-status",
+              icon: <TagOutlined />,
+              label: <Link to="/admin/costumes/status">จัดการสถานะชุด</Link>,
+            },
+            {
+              key: "images",
+              icon: <FileImageOutlined />,
+              label: <Link to="/admin/images">จัดการรูปภาพ</Link>,
+            },
+          ]}
+        />
+      </Drawer>
+    </Header>
   );
 };
 

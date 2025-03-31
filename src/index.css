@@ -2,7 +2,7 @@
 
 * {
   box-sizing: border-box;
-  font-family: "Prompt", sans-serif;
+  font-family: "Prompt", sans-serif !important;
 }
 
 @media (max-width: 768px) {

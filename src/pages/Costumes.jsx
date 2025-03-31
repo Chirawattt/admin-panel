@@ -7,18 +7,9 @@ import {
   Select,
   Upload,
   Layout,
-  Menu,
-  Dropdown,
-  Drawer,
+  message,
 } from "antd";
-import {
-  UploadOutlined,
-  LogoutOutlined,
-  UserOutlined,
-  FileImageOutlined,
-  ShoppingOutlined,
-  MenuOutlined,
-} from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,11 +17,13 @@ import {
   FetchCostumes,
   AddCostume,
   UpdateCostume,
+  UpdateCostumeIsRentable,
   DeleteCostume,
 } from "../api/costumeApi";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar"; // Import Navbar component
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 const Costumes = () => {
   const navigate = useNavigate();
@@ -62,6 +55,9 @@ const Costumes = () => {
   // สำหรับ Modal แสดงรูปภาพใหญ่
   const [selectedImage, setSelectedImage] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+  // สำหรับการตั้งค่าการแสดงผลในตาราง
+  const [pageSize, setPageSize] = useState(10);
 
   const [form] = Form.useForm();
 
@@ -174,7 +170,7 @@ const Costumes = () => {
     form.resetFields();
   };
 
-  // ✅ ค้นหา และ กรองชุด
+  // ค้นหา และ กรองชุด
   const filteredData = data?.filter(
     (costume) =>
       costume.name
@@ -184,6 +180,28 @@ const Costumes = () => {
         ? costume.category.toString() === filterState.categoryFilter
         : true)
   );
+
+  const handleToggleRentableStatus = (record) => {
+    const nextValue = record.isRentable ? 0 : 1;
+    const toggleText = nextValue === 1 ? "เปิดให้บริการ" : "ปิดการให้บริการ";
+
+    Modal.confirm({
+      title: "ยืนยันการเปลี่ยนสถานะ",
+      content: `คุณแน่ใจหรือไม่ว่าจะ${toggleText}สำหรับชุด "${record.name}"?`,
+      okText: "ยืนยัน",
+      cancelText: "ยกเลิก",
+      onOk: async () => {
+        try {
+          await UpdateCostumeIsRentable(record.id, nextValue);
+          message.success(`เปลี่ยนสถานะเป็น "${toggleText}" สำเร็จ`);
+          queryClient.invalidateQueries({ queryKey: ["costumes"] });
+        } catch (err) {
+          console.error("เกิดข้อผิดพลาด:", err);
+          toast.error("เกิดข้อผิดพลาดในการเปลี่ยนสถานะ");
+        }
+      },
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -226,86 +244,15 @@ const Costumes = () => {
 
   return (
     <Layout>
-      {/* ✅ Navbar ด้านบน */}
-      <Header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "#fff",
-          padding: "0 20px",
-        }}
-      >
-        {/* ปุ่มเมนูสำหรับมือถือ */}
-        <Button
-          type="text"
-          icon={<MenuOutlined />}
-          onClick={() => setIsDrawerOpen(true)}
-          style={{ display: "none", fontSize: "20px" }}
-          className="menu-button"
-        />
-
-        <h2 style={{ textAlign: "center", fontWeight: "bold" }}>Moso-Yodia</h2>
-        <Menu
-          mode="horizontal"
-          style={{ flex: 1, justifyContent: "center" }}
-          className="desktop-menu"
-          items={[
-            {
-              key: "costumes",
-              icon: <ShoppingOutlined />,
-              label: <Link to="/admin/costumes">จัดการชุด</Link>,
-            },
-            {
-              key: "images",
-              icon: <FileImageOutlined />,
-              label: <Link to="/admin/images">จัดการรูปภาพ</Link>,
-            },
-          ]}
-        />
-        {/* ✅ ใช้ menu แทน overlay */}
-        <Dropdown
-          menu={{
-            items: [
-              {
-                key: "logout",
-                label: "ออกจากระบบ",
-                icon: <LogoutOutlined />,
-                onClick: handleLogout,
-              },
-            ],
-          }}
-          trigger={["click"]}
-        >
-          <Button icon={<UserOutlined />}>{userState.username}</Button>
-        </Dropdown>
-
-        {/* Drawer สำหรับมือถือ */}
-        <Drawer
-          title="เมนู"
-          placement="left"
-          onClose={() => setIsDrawerOpen(false)}
-          open={isDrawerOpen}
-        >
-          <Menu
-            mode="vertical"
-            items={[
-              {
-                key: "costumes",
-                icon: <ShoppingOutlined />,
-                label: <Link to="/admin/costumes">จัดการชุด</Link>,
-              },
-              {
-                key: "images",
-                icon: <FileImageOutlined />,
-                label: <Link to="/admin/images">จัดการรูปภาพ</Link>,
-              },
-            ]}
-          />
-        </Drawer>
-      </Header>
-
-      {/* ✅ Container ครอบเนื้อหา */}
+      {/* Navbar ด้านบน */}
+      <Navbar
+        username={userState.username}
+        onLogout={handleLogout}
+        onMenuClick={() => setIsDrawerOpen(true)}
+        isDrawerOpen={isDrawerOpen}
+        onCloseDrawer={() => setIsDrawerOpen(false)}
+      />
+      {/* Container ครอบเนื้อหา */}
       <Content
         style={{
           margin: "20px auto",
@@ -318,7 +265,7 @@ const Costumes = () => {
       >
         <h2>จัดการชุด</h2>
 
-        {/* ✅ ค้นหาและกรองชุด */}
+        {/* ค้นหาและกรองชุด */}
         <Input.Search
           placeholder="ค้นหาชุด..."
           allowClear
@@ -349,13 +296,13 @@ const Costumes = () => {
           เพิ่มชุดใหม่
         </Button>
 
-        {/* ✅ ตารางแสดงรายการชุด */}
+        {/* ตารางแสดงรายการชุด */}
         <Table
           columns={[
             {
               title: "รูปภาพ",
               dataIndex: "image_path",
-              key: "iamge",
+              key: "image",
               render: (image_path) =>
                 image_path ? (
                   <img
@@ -389,6 +336,31 @@ const Costumes = () => {
               },
             },
             {
+              title: "การให้บริการ",
+              dataIndex: "isRentable",
+              key: "isRentable",
+              align: "center",
+              render: (isRentable, record) => {
+                const isActive = Boolean(isRentable);
+                const buttonText = isActive ? "ให้บริการ" : "ไม่ให้บริการ";
+
+                return (
+                  <Button
+                    type="primary"
+                    danger={!isActive}
+                    style={
+                      isActive
+                        ? { backgroundColor: "#52c41a", borderColor: "#52c41a" }
+                        : {}
+                    }
+                    onClick={() => handleToggleRentableStatus(record)}
+                  >
+                    {buttonText}
+                  </Button>
+                );
+              },
+            },
+            {
               title: "การกระทำ",
               align: "center",
               render: (_, record) => (
@@ -404,11 +376,19 @@ const Costumes = () => {
           dataSource={filteredData}
           rowKey="id"
           loading={isLoading}
-          pagination={{ pageSize: 5 }}
+          pagination={{
+            pageSize: pageSize, // จำนวนแถวต่อหน้า
+            showQuickJumper: true, //  เปิดให้เลือกหน้า
+            showSizeChanger: true, //  เปิดให้เลือกจำนวนแถวต่อหน้า
+            pageSizeOptions: ["5", "10", "20", "50"], //  ตัวเลือกที่แสดง
+            onShowSizeChange: (current, size) => setPageSize(size),
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} จากทั้งหมด ${total} รายการ`,
+          }}
           scroll={{ x: "max-content" }} // เพิ่ม scroll เมื่อหน้าจอเล็ก
         />
 
-        {/* ✅ Modal เพิ่ม/แก้ไขชุด */}
+        {/* Modal เพิ่ม/แก้ไขชุด */}
         <Modal
           title={costumeState.editCostume ? "แก้ไขชุด" : "เพิ่มชุดใหม่"}
           open={costumeState.isModalOpen}
@@ -427,7 +407,7 @@ const Costumes = () => {
             onFinish={onFinish}
             onValuesChange={handleFormChange}
           >
-            {/* ✅ อัปโหลดรูปภาพ */}
+            {/* อัปโหลดรูปภาพ */}
             <Form.Item label="อัปโหลดรูปภาพ">
               <Upload
                 beforeUpload={() => false}
@@ -442,7 +422,7 @@ const Costumes = () => {
                   * โปรดอัปโหลดรูปภาพชุดทุกครั้งในการเพิ่มชุด
                 </p>
               )}
-              {/* ✅ แสดงชื่อไฟล์ที่เลือก */}
+              {/* แสดงชื่อไฟล์ที่เลือก */}
               {(costumeState.selectedImage ||
                 costumeState.editCostume?.image_name) && (
                 <p style={{ marginTop: 10 }}>
@@ -452,7 +432,7 @@ const Costumes = () => {
                 </p>
               )}
 
-              {/* ✅ แสดง Preview รูปภาพ */}
+              {/* แสดง Preview รูปภาพ */}
               {costumeState.previewImage && (
                 <img
                   src={costumeState.previewImage}
@@ -504,22 +484,22 @@ const Costumes = () => {
           </Form>
         </Modal>
 
-        {/* ✅ Modal แสดงรูปภาพใหญ่ */}
+        {/*  Modal แสดงรูปภาพใหญ่ */}
         <Modal
           open={isImageModalOpen}
           footer={null}
           onCancel={() => setIsImageModalOpen(false)}
           centered
-          width={800} // ✅ กำหนดความกว้างให้ใหญ่ขึ้น
+          width={800} //  กำหนดความกว้างให้ใหญ่ขึ้น
         >
           <div style={{ textAlign: "center" }}>
             <img
               src={selectedImage}
               alt="Enlarged costume"
               style={{
-                maxWidth: "100%", // ✅ ป้องกันรูปใหญ่เกิน Modal
-                maxHeight: "80vh", // ✅ ป้องกันรูปสูงเกินจอ
-                objectFit: "contain", // ✅ คงอัตราส่วนของรูป
+                maxWidth: "100%", // ป้องกันรูปใหญ่เกิน Modal
+                maxHeight: "80vh", // ป้องกันรูปสูงเกินจอ
+                objectFit: "contain", // คงอัตราส่วนของรูป
                 borderRadius: 8,
               }}
             />
