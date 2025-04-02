@@ -1,6 +1,16 @@
 // src/pages/CostumeStatus.jsx
 import React, { useEffect, useState } from "react";
-import { Layout, Input, Select, Tag, Button, Modal, message } from "antd";
+import {
+  Layout,
+  Input,
+  Select,
+  Tag,
+  Button,
+  Modal,
+  message,
+  Spin,
+  Typography,
+} from "antd";
 import {
   FetchRentableCostumes,
   UpdateCostumeStatus,
@@ -10,6 +20,12 @@ import Navbar from "../components/Navbar";
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/th";
+
+dayjs.extend(relativeTime);
+dayjs.locale("th");
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -25,12 +41,11 @@ const CostumeStatus = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState(null);
 
-  const [userState, setUserState] = useState({
-    username: localStorage.getItem("username"),
-  });
+  const [userState, setUserState] = useState({});
   // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { Title } = Typography;
 
   const filterCostumes = React.useCallback(() => {
     let filtered = costumes.filter((c) =>
@@ -140,7 +155,7 @@ const CostumeStatus = () => {
           boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
         }}
       >
-        <h2>จัดการสถานะชุดเช่า</h2>
+        <Title level={3}>จัดการสถานะชุด</Title>
 
         {/* ✅ ค้นหาและกรองชุด */}
         <Input.Search
@@ -211,55 +226,63 @@ const CostumeStatus = () => {
               marginTop: 24,
             }}
           >
-            {filteredCostumes.map((costume) => {
-              const isAvailable = costume.status === 1;
-              return (
-                <div
-                  key={costume.id}
-                  onClick={() => {
-                    setSelectedCostume(costume);
-                    setDetailVisible(true);
-                  }}
-                  style={{
-                    width: 220,
-                    cursor: "pointer",
-                    borderRadius: 8,
-                    overflow: "hidden",
-                    backgroundColor: isAvailable ? "#adffd3" : "#fcb5a7",
-                    position: "relative",
-                    transition: "box-shadow 0.3s, transform 0.3s",
-                    boxShadow:
-                      highlightedId === costume.id
-                        ? "0 0 0 4px rgb(80, 80, 80) inset"
-                        : "0px 2px 8px rgba(0,0,0,0.15)",
-                    transform:
-                      highlightedId === costume.id ? "scale(1.02)" : "scale(1)",
-                  }}
-                >
+            {loading ? (
+              <div style={{ textAlign: "center", marginTop: 50 }}>
+                <Spin size="large" />
+              </div>
+            ) : (
+              filteredCostumes.map((costume) => {
+                const isAvailable = costume.status === 1;
+                return (
                   <div
+                    key={costume.id}
+                    onClick={() => {
+                      setSelectedCostume(costume);
+                      setDetailVisible(true);
+                    }}
                     style={{
-                      position: "absolute",
-                      top: 8,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      zIndex: 1,
+                      width: 220,
+                      cursor: "pointer",
+                      borderRadius: 8,
+                      overflow: "hidden",
+                      backgroundColor: isAvailable ? "#adffd3" : "#fcb5a7",
+                      position: "relative",
+                      transition: "box-shadow 0.3s, transform 0.3s",
+                      boxShadow:
+                        highlightedId === costume.id
+                          ? "0 0 0 4px rgb(80, 80, 80) inset"
+                          : "0px 2px 8px rgba(0,0,0,0.15)",
+                      transform:
+                        highlightedId === costume.id
+                          ? "scale(1.02)"
+                          : "scale(1)",
                     }}
                   >
-                    {getStatusTag(costume.status)}
-                  </div>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        zIndex: 1,
+                      }}
+                    >
+                      {getStatusTag(costume.status)}
+                    </div>
 
-                  <img
-                    src={costume.image_path}
-                    alt={costume.name}
-                    style={{ width: "100%", height: 250, objectFit: "cover" }}
-                  />
+                    <img
+                      src={costume.image_path}
+                      alt={costume.name}
+                      style={{ width: "100%", height: 250, objectFit: "cover" }}
+                    />
 
-                  <div style={{ padding: 12, textAlign: "center" }}>
-                    <h4 style={{ margin: 0 }}>{costume.name}</h4>
+                    <div style={{ padding: 12, textAlign: "center" }}>
+                      <h4 style={{ margin: 0 }}>{costume.name}</h4>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         )}
 
@@ -317,6 +340,14 @@ const CostumeStatus = () => {
           </p>
           <p>
             <b>สถานะปัจจุบัน:</b> {getStatusTag(selectedCostume?.status)}
+          </p>
+          <p style={{ color: "#888" }}>
+            <b>อัปเดตสถานะล่าสุด: </b>
+            {dayjs(selectedCostume?.updatedAt).fromNow()}
+            <br />
+            {dayjs(selectedCostume?.updatedAt).format(
+              "D MMMM YYYY เวลา HH:mm น."
+            )}
           </p>
         </Modal>
       </Content>

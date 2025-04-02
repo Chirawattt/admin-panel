@@ -7,6 +7,7 @@ import {
   Select,
   Upload,
   Layout,
+  Typography,
   message,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
@@ -24,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar"; // Import Navbar component
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 const Costumes = () => {
   const navigate = useNavigate();
@@ -263,7 +265,7 @@ const Costumes = () => {
           boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
         }}
       >
-        <h2>จัดการชุด</h2>
+        <Title level={3}>จัดการชุด</Title>
 
         {/* ค้นหาและกรองชุด */}
         <Input.Search

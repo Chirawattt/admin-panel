@@ -6,6 +6,14 @@ import "antd/dist/reset.css"; // Reset CSS for Ant Design
 import "antd/dist/antd.min.js"; // JS for Ant Design
 import "./index.css"; // Custom CSS
 
+// เปลี่ยนเวลาให้เป็นภาษาไทย
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/th";
+
+dayjs.extend(relativeTime);
+dayjs.locale("th");
+
 const queryClient = new QueryClient();
 
 ReactDom.createRoot(document.getElementById("root")).render(

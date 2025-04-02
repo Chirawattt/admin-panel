@@ -46,7 +46,14 @@ const Navbar = ({
         className="menu-button"
       />
 
-      <h2 style={{ textAlign: "center", fontWeight: "bold" }}>Moso-Yodia</h2>
+      {/* โลโก้รูปภาพ */}
+      <img
+        src="/Moso-Yodia-Logo.png"
+        alt="Logo"
+        style={{ width: 90, height: 90, borderRadius: "50%" }}
+      />
+
+      {/* เมนูสำหรับเดสก์ท็อป */}
       <Menu
         mode="horizontal"
         selectedKeys={[currentKey]}
