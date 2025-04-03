@@ -18,61 +18,24 @@ import {
 } from "../api/costumeApi";
 import Navbar from "../components/Navbar";
 
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/th";
-
-dayjs.extend(relativeTime);
-dayjs.locale("th");
 
 const { Content } = Layout;
 const { Option } = Select;
 
 const CostumeStatus = () => {
   const [costumes, setCostumes] = useState([]);
-  const [filteredCostumes, setFilteredCostumes] = useState([]);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState(null);
+  const [filterState, setFilterState] = useState({
+    search: "",
+    categoryFilter: null,
+    statusFilter: "all",
+  });
+
   const [selectedCostume, setSelectedCostume] = useState(null);
   const [detailVisible, setDetailVisible] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState(null);
-
-  const [userState, setUserState] = useState({});
-  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { Title } = Typography;
-
-  const filterCostumes = React.useCallback(() => {
-    let filtered = costumes.filter((c) =>
-      c.name.toLowerCase().includes(search.toLowerCase())
-    );
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((c) => c.status === parseInt(statusFilter));
-    }
-    if (categoryFilter !== null) {
-      filtered = filtered.filter((c) => c.category === categoryFilter);
-    }
-    setFilteredCostumes(filtered);
-  }, [categoryFilter, costumes, search, statusFilter]);
-
-  useEffect(() => {
-    if (!localStorage.getItem("token")) {
-      toast.error("โปรดเข้าสู่ระบบก่อนใช้งาน");
-      navigate("/");
-    }
-    fetchCostumes();
-    localStorage.getItem("username") &&
-      setUserState({ username: localStorage.getItem("username") });
-  }, [navigate]);
-
-  useEffect(() => {
-    filterCostumes();
-  }, [search, statusFilter, costumes, filterCostumes]);
 
   const fetchCostumes = async () => {
     setLoading(true);
@@ -85,6 +48,32 @@ const CostumeStatus = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchCostumes();
+  }, []);
+
+  const filterCostumes = React.useMemo(
+    () =>
+      costumes?.filter(
+        (costume) =>
+          costume.name
+            .toLowerCase()
+            .includes(filterState.search.toLowerCase()) &&
+          (filterState.categoryFilter
+            ? costume.category.toString() === filterState.categoryFilter
+            : true) &&
+          (filterState.statusFilter !== "all"
+            ? costume.status.toString() === filterState.statusFilter
+            : true)
+      ) || [],
+    [
+      costumes,
+      filterState.search,
+      filterState.categoryFilter,
+      filterState.statusFilter,
+    ]
+  );
 
   const resetAllCostumeStatusToAvailable = async () => {
     setLoading(true);
@@ -123,26 +112,10 @@ const CostumeStatus = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      localStorage.clear(); // ลบข้อมูลใน localStorage ทั้งหมด
-      toast.success("ออกจากระบบสำเร็จ!"); // toast แจ้งเตือน
-      navigate("/"); // ไปหน้า Login
-    } catch {
-      toast.error("เกิดข้อผิดพลาดในการออกจากระบบ");
-    }
-  };
-
   return (
     <Layout>
       {/* Navbar ด้านบน */}
-      <Navbar
-        username={userState.username}
-        onLogout={handleLogout}
-        onMenuClick={() => setIsDrawerOpen(true)}
-        isDrawerOpen={isDrawerOpen}
-        onCloseDrawer={() => setIsDrawerOpen(false)}
-      />
+      <Navbar />
 
       {/* Container ครอบเนื้อหา */}
       <Content
@@ -161,25 +134,32 @@ const CostumeStatus = () => {
         <Input.Search
           placeholder="ค้นหาชื่อชุด"
           allowClear
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) =>
+            setFilterState({ ...filterState, search: e.target.value })
+          }
           style={{ width: 200, marginRight: 10, marginBottom: 10 }}
         />
 
         <Select
           placeholder="กรองตามประเภท"
           allowClear
-          onChange={(value) => setCategoryFilter(value)}
+          onChange={(value) =>
+            setFilterState({ ...filterState, categoryFilter: value })
+          }
           style={{ width: 200, marginRight: 10, marginBottom: 10 }}
         >
-          <Option value={0}>กิโมโน</Option>
-          <Option value={1}>ยูกาตะ</Option>
-          <Option value={2}>คอสเพลย์</Option>
+          <Option value="0">กิโมโน</Option>
+          <Option value="1">ยูกาตะ</Option>
+          <Option value="2">คอสเพลย์</Option>
         </Select>
 
         <Select
-          defaultValue="all"
+          placeholder="กรองตามสถานะ"
+          allowClear
           style={{ width: 200, marginRight: 10, marginBottom: 10 }}
-          onChange={setStatusFilter}
+          onChange={(value) =>
+            setFilterState({ ...filterState, statusFilter: value })
+          }
         >
           <Option value="all">ทั้งหมด</Option>
           <Option value="1">ว่าง</Option>
@@ -211,7 +191,7 @@ const CostumeStatus = () => {
         </Button>
 
         {/* ✅ รายการชุดเป็น Card */}
-        {filteredCostumes.length === 0 ? (
+        {filterCostumes.length === 0 ? (
           <div style={{ textAlign: "center", marginTop: 40, color: "#999" }}>
             <p style={{ fontSize: 20 }}>😢 ไม่พบชุดที่ตรงกับเงื่อนไข</p>
             <p>โปรดลองเปลี่ยนคำค้นหาหรือกรองประเภทใหม่</p>
@@ -231,7 +211,7 @@ const CostumeStatus = () => {
                 <Spin size="large" />
               </div>
             ) : (
-              filteredCostumes.map((costume) => {
+              filterCostumes.map((costume) => {
                 const isAvailable = costume.status === 1;
                 return (
                   <div

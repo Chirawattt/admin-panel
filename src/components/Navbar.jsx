@@ -1,5 +1,7 @@
 // Navbar.jsx
 import { Layout, Menu, Dropdown, Button, Drawer } from "antd";
+import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
 import {
   UserOutlined,
   LogoutOutlined,
@@ -8,24 +10,40 @@ import {
   TagOutlined,
   MenuOutlined,
 } from "@ant-design/icons";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const { Header } = Layout;
 
-const Navbar = ({
-  username,
-  onLogout,
-  onMenuClick,
-  isDrawerOpen,
-  onCloseDrawer,
-}) => {
+const Navbar = () => {
+  const navigate = useNavigate();
   const location = useLocation();
+  const [userState, setUserState] = useState({});
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const pathToKeyMap = {
     "/admin/costumes": "costumes",
     "/admin/costumes/status": "costume-status",
     "/admin/images": "images",
   };
   const currentKey = pathToKeyMap[location.pathname] || "costumes";
+
+  const handleLogout = async () => {
+    try {
+      localStorage.clear(); // ลบข้อมูลใน localStorage ทั้งหมด
+      toast.success("ออกจากระบบสำเร็จ!"); // toast แจ้งเตือน
+      navigate("/"); // ไปหน้า Login
+    } catch {
+      toast.error("เกิดข้อผิดพลาดในการออกจากระบบ");
+    }
+  };
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      toast.error("โปรดเข้าสู่ระบบก่อนใช้งาน");
+      navigate("/");
+    }
+    localStorage.getItem("username") &&
+      setUserState({ username: localStorage.getItem("username") });
+  }, [navigate]);
 
   return (
     <Header
@@ -41,9 +59,9 @@ const Navbar = ({
       <Button
         type="text"
         icon={<MenuOutlined />}
-        onClick={onMenuClick}
+        onClick={() => setIsDrawerOpen(true)}
+        className="mobile-menu-button"
         style={{ display: "none", fontSize: "20px" }}
-        className="menu-button"
       />
 
       {/* โลโก้รูปภาพ */}
@@ -85,20 +103,20 @@ const Navbar = ({
               key: "logout",
               label: "ออกจากระบบ",
               icon: <LogoutOutlined />,
-              onClick: onLogout,
+              onClick: handleLogout,
             },
           ],
         }}
         trigger={["click"]}
       >
-        <Button icon={<UserOutlined />}>{username}</Button>
+        <Button icon={<UserOutlined />}>{userState.username}</Button>
       </Dropdown>
 
       {/* Drawer สำหรับมือถือ */}
       <Drawer
         title="เมนู"
         placement="left"
-        onClose={onCloseDrawer}
+        onClose={() => setIsDrawerOpen(false)}
         open={isDrawerOpen}
       >
         <Menu

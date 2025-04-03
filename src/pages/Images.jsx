@@ -25,7 +25,6 @@ import {
   DeleteImage,
 } from "../api/ImageApi";
 import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom";
 import { Content } from "antd/es/layout/layout";
 import dayjs from "dayjs";
 
@@ -34,13 +33,9 @@ const { Title } = Typography;
 
 const Images = () => {
   const [costumes, setCostumes] = useState([]);
-  const [userState, setUserState] = useState({});
   const [selectedCostumeId, setSelectedCostumeId] = useState(null);
   const [reviewImages, setReviewImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCostumes();
@@ -52,14 +47,13 @@ const Images = () => {
     } else {
       setReviewImages([]);
     }
-    localStorage.getItem("username") &&
-      setUserState({ username: localStorage.getItem("username") });
   }, [selectedCostumeId]);
 
   const fetchCostumes = async () => {
     try {
       const data = await FetchCostumes();
       setCostumes(data);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       message.error("ไม่สามารถโหลดชุดได้");
     }
@@ -70,6 +64,7 @@ const Images = () => {
     try {
       const data = await FetchReviewImages(costumeId);
       setReviewImages(data);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       message.error("ไม่สามารถโหลดรูปภาพรีวิวได้");
     }
@@ -90,6 +85,7 @@ const Images = () => {
       await AddReviewImage(formData);
       message.success("อัปโหลดรูปภาพสำเร็จ");
       fetchReviewImages(selectedCostumeId);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       message.error("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ");
     }
@@ -100,30 +96,15 @@ const Images = () => {
       await DeleteImage(imageId);
       message.success("ลบรูปภาพสำเร็จ");
       fetchReviewImages(selectedCostumeId);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       message.error("เกิดข้อผิดพลาดในการลบรูปภาพ");
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      localStorage.clear();
-      toast.success("ออกจากระบบสำเร็จ!");
-      navigate("/");
-    } catch {
-      toast.error("เกิดข้อผิดพลาดในการออกจากระบบ");
-    }
-  };
-
   return (
     <Layout>
-      <Navbar
-        username={userState.username}
-        onLogout={handleLogout}
-        onMenuClick={() => setIsDrawerOpen(true)}
-        isDrawerOpen={isDrawerOpen}
-        onCloseDrawer={() => setIsDrawerOpen(false)}
-      />
+      <Navbar />
 
       <Content
         style={{
