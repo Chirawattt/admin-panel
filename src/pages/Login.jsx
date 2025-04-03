@@ -16,8 +16,8 @@ const Login = () => {
     try {
       await login(values);
       navigate("/admin/costumes");
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.log(error);
       toast.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
     }
     setLoading(false);

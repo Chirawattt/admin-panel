@@ -1,5 +1,17 @@
 import api from "./axiosConfig";
 
+// นำเข้าหรือกำหนดค่า IMAGE_BASE_URL เช่นเดียวกับที่ใช้ใน ImageApi.js
+const getImageBaseUrl = () => {
+  // ถ้ารันบน localhost แสดงว่าเป็น development environment
+  if (window.location.hostname === "localhost") {
+    return "http://localhost:5000";
+  }
+  // ถ้าไม่ใช่ localhost แสดงว่าเป็น production จึงใช้ host เดียวกับที่ deploy
+  return window.location.origin;
+};
+
+const IMAGE_BASE_URL = getImageBaseUrl();
+
 export const FetchCostumes = async () => {
   const response = await api.get("/costumes");
 
@@ -11,7 +23,9 @@ export const FetchCostumes = async () => {
       .split("-")
       .slice(1)
       .join(""),
-    image_path: `http://localhost:5000/${costume.image_path}`,
+    image_path: costume.image_path.startsWith("http")
+      ? costume.image_path // ถ้าเป็น URL เต็มแล้วให้ใช้เลย
+      : `${IMAGE_BASE_URL}/${costume.image_path.replace(/^\//, "")}`, // ป้องกันการมี / ซ้ำ
   }));
 };
 
@@ -25,7 +39,9 @@ export const FetchRentableCostumes = async () => {
       .split("-")
       .slice(1)
       .join(""),
-    image_path: `http://localhost:5000/${costume.image_path}`,
+    image_path: costume.image_path.startsWith("http")
+      ? costume.image_path // ถ้าเป็น URL เต็มแล้วให้ใช้เลย
+      : `${IMAGE_BASE_URL}/${costume.image_path.replace(/^\//, "")}`, // ป้องกันการมี / ซ้ำ
   }));
 };
 
@@ -51,7 +67,9 @@ export const FetchReviewImages = async (id) => {
   const response = await api.get(`/costumes/${id}/reviewImages`);
   return response.data.map((review) => ({
     ...review,
-    image_path: `http://localhost:5000/${review.image_path}`,
+    image_path: review.image_path.startsWith("http")
+      ? review.image_path // ถ้าเป็น URL เต็มแล้วให้ใช้เลย
+      : `${IMAGE_BASE_URL}/${review.image_path.replace(/^\//, "")}`, // ป้องกันการมี / ซ้ำ
   }));
 };
 

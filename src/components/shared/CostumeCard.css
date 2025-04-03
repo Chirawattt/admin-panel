@@ -1,0 +1,90 @@
+/* CostumeCard.css */
+.costume-card {
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.costume-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px) !important;
+}
+
+.costume-card.selected {
+  border: 2px solid #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.5);
+}
+
+.costume-card.highlighted {
+  box-shadow: 0 0 0 4px rgba(80, 80, 80, 0.7) inset;
+}
+
+.costume-card.available {
+  background-color: rgba(173, 255, 211, 0.7);
+}
+
+.costume-card.unavailable {
+  background-color: rgba(252, 181, 167, 0.7);
+}
+
+.costume-card-status {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+}
+
+.costume-card-image-container {
+  position: relative;
+  padding-bottom: 100%;
+  height: 0;
+  overflow: hidden;
+}
+
+.costume-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.costume-card-image-container:hover .costume-card-image {
+  transform: scale(1.05);
+}
+
+.costume-card-content {
+  padding: 12px;
+  flex-grow: 1;
+  background-color: #fff;
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.costume-card-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-weight: bold !important;
+  color: rgba(0, 0, 0, 0.85) !important;
+}
+
+.costume-card-subtitle {
+  display: block;
+  font-size: 12px !important;
+  text-align: center;
+  margin-top: 4px;
+  color: rgba(0, 0, 0, 0.45) !important;
+}

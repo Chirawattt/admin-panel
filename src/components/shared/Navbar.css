@@ -1,0 +1,121 @@
+/* Navbar.css */
+.navbar-header {
+  transition: all 0.3s ease;
+}
+
+.navbar-logo-container {
+  transition: all 0.3s ease;
+}
+
+.navbar-logo {
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+.navbar-title {
+  color: #1890ff;
+  transition: color 0.3s ease;
+}
+
+.navbar-mobile-button {
+  transition: all 0.3s ease;
+}
+
+.navbar-mobile-button:hover {
+  color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+.navbar-menu .ant-menu-item {
+  padding: 0 20px;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.navbar-menu .ant-menu-item:hover {
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+.navbar-menu .ant-menu-item-selected {
+  font-weight: 500;
+}
+
+.navbar-user-button {
+  transition: all 0.3s ease;
+}
+
+.navbar-user-button:hover {
+  transform: scale(1.05);
+}
+
+.navbar-drawer .ant-drawer-header {
+  padding: 12px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.navbar-drawer-menu .ant-menu-item {
+  padding: 0 24px;
+  margin: 4px 0;
+  height: 50px;
+  line-height: 50px;
+  transition: all 0.3s ease;
+}
+
+.navbar-drawer-footer {
+  transition: all 0.3s ease;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .navbar-header {
+    padding: 0 10px;
+  }
+
+  .navbar-user-button {
+    padding: 4px 8px;
+    min-width: 40px;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-title {
+    display: none;
+  }
+
+  .navbar-drawer-menu .ant-menu-item {
+    height: 45px;
+    line-height: 45px;
+  }
+}
+
+/* Animation for mobile menu items */
+.navbar-drawer-menu .ant-menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar-drawer-menu .ant-menu-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  width: 0;
+  height: 2px;
+  background-color: #1890ff;
+  transition: width 0.3s ease;
+}
+
+.navbar-drawer-menu .ant-menu-item-selected::after {
+  width: calc(100% - 48px);
+}
+
+/* Active state styling for both menus */
+.navbar-menu .ant-menu-item-selected,
+.navbar-drawer-menu .ant-menu-item-selected {
+  color: #1890ff;
+  font-weight: 500;
+}
