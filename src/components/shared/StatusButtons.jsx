@@ -16,7 +16,7 @@ const StatusButtons = ({
 
   return (
     <Row gutter={[8, 8]} style={{ width: screens.xs ? "100%" : "auto" }}>
-      <Col span={screens.xs ? 12 : 24}>
+      <Col span={screens.xs ? 12 : 24} style={{ display: "flex", gap: 8 }}>
         <Badge
           count={statusCounts.available}
           showZero
@@ -41,8 +41,6 @@ const StatusButtons = ({
             ว่าง
           </Button>
         </Badge>
-      </Col>
-      <Col span={screens.xs ? 12 : 24}>
         <Badge count={statusCounts.unavailable} showZero color="red">
           <Button
             type={filterState.statusFilter === "0" ? "primary" : "default"}

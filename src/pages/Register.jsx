@@ -14,73 +14,79 @@ import {
 import {
   UserOutlined,
   LockOutlined,
+  MailOutlined,
+  UserAddOutlined,
   FileOutlined,
   LockFilled,
 } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { login } from "../api/authApi";
-import logo from "../assets/logo.png"; // ต้องมีโลโก้ในโฟลเดอร์ assets
+import { register } from "../api/authApi";
+import logo from "../assets/logo.png";
 import TermsModal from "../components/shared/TermsModal";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
-const Login = () => {
+const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form] = Form.useForm();
-  const [rememberMe, setRememberMe] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const navigate = useNavigate();
 
-  // โหลดค่า username ที่บันทึกไว้เมื่อคอมโพเนนต์โหลด
-  useEffect(() => {
-    const rememberedUser = localStorage.getItem("rememberedUser");
-    if (rememberedUser) {
-      form.setFieldsValue({
-        username: rememberedUser,
-      });
-      setRememberMe(true);
-    }
-  }, [form]);
+  const handleCheckboxChange = (e) => {
+    setAgreeTerms(e.target.checked);
+  };
 
-  const handleRememberChange = (e) => {
-    setRememberMe(e.target.checked);
+  const handleViewTerms = () => {
+    setShowTermsModal(true);
   };
 
   const handleAcceptTerms = () => {
-    // บันทึกว่าผู้ใช้ได้ยอมรับเงื่อนไขแล้ว
-    localStorage.setItem("acceptedTerms", "true");
+    setAgreeTerms(true);
     setShowTermsModal(false);
+    localStorage.setItem("acceptedTerms", "true");
     toast.success("คุณได้ยอมรับเงื่อนไขการใช้งานแล้ว");
   };
 
   const handleCancelTerms = () => {
-    // เพียงแค่ปิด modal โดยไม่มีการแจ้งเตือนใดๆ
     setShowTermsModal(false);
+    // ไม่ตั้งค่า agreeTerms เป็น true เพราะผู้ใช้ไม่ยอมรับเงื่อนไข
   };
 
   const onFinish = async (values) => {
+    if (!agreeTerms) {
+      toast.error("กรุณายอมรับเงื่อนไขการใช้งานก่อนดำเนินการต่อ");
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
-      // จัดการกับการจดจำชื่อผู้ใช้
-      if (rememberMe) {
-        localStorage.setItem("rememberedUser", values.username);
-      } else {
-        localStorage.removeItem("rememberedUser");
+      // ตรวจสอบรหัสผ่านว่าตรงกัน
+      if (values.password !== values.confirmPassword) {
+        throw new Error("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน");
       }
 
-      // เรียก API login
-      await login(values);
+      // ส่งข้อมูลไปยัง API โดยไม่รวม confirmPassword
+      const userData = {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        role: values.role || "user",
+      };
 
-      // นำทางไปหน้าต่อไป
-      navigate("/admin/costumes");
+      await register(userData);
+
+      // แสดงข้อความสำเร็จ
+      toast.success("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
+      navigate("/login");
     } catch (error) {
-      setError(error);
-      toast.error(error);
+      setError(error.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      toast.error(error.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
     }
     setLoading(false);
   };
@@ -132,7 +138,7 @@ const Login = () => {
         }}
       >
         <Card
-          className="login-card"
+          className="register-card"
           style={{
             width: "100%",
             maxWidth: 420,
@@ -150,8 +156,8 @@ const Login = () => {
           }}
         >
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <Title level={2}>เข้าสู่ระบบ</Title>
-            <Text type="secondary">กรอกข้อมูลเพื่อเข้าสู่ระบบจัดการร้าน</Text>
+            <Title level={2}>สมัครสมาชิก</Title>
+            <Text type="secondary">สร้างบัญชีเพื่อใช้งานระบบจัดการร้าน</Text>
           </div>
 
           {error && (
@@ -170,7 +176,7 @@ const Login = () => {
             layout="vertical"
             onFinish={onFinish}
             initialValues={{
-              remember: false,
+              role: "user", // ค่าเริ่มต้นเป็น user
             }}
           >
             <Form.Item
@@ -184,6 +190,21 @@ const Login = () => {
               <Input
                 prefix={<UserOutlined style={{ color: "rgba(0,0,0,.25)" }} />}
                 placeholder="ชื่อผู้ใช้"
+                size="large"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="อีเมล"
+              name="email"
+              rules={[
+                { required: true, message: "กรุณากรอกอีเมล" },
+                { type: "email", message: "รูปแบบอีเมลไม่ถูกต้อง" },
+              ]}
+            >
+              <Input
+                prefix={<MailOutlined style={{ color: "rgba(0,0,0,.25)" }} />}
+                placeholder="อีเมล"
                 size="large"
               />
             </Form.Item>
@@ -203,21 +224,42 @@ const Login = () => {
               />
             </Form.Item>
 
+            <Form.Item
+              label="ยืนยันรหัสผ่าน"
+              name="confirmPassword"
+              rules={[
+                { required: true, message: "กรุณายืนยันรหัสผ่าน" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("password") === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน")
+                    );
+                  },
+                }),
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined style={{ color: "rgba(0,0,0,.25)" }} />}
+                placeholder="ยืนยันรหัสผ่าน"
+                size="large"
+              />
+            </Form.Item>
+
             <Form.Item>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Checkbox checked={rememberMe} onChange={handleRememberChange}>
-                  จดจำฉัน
-                </Checkbox>
-                <Link to="/forgot-password" style={{ fontWeight: "bold" }}>
-                  ลืมรหัสผ่าน?
-                </Link>
-              </div>
+              <Checkbox checked={agreeTerms} onChange={handleCheckboxChange}>
+                ฉันได้อ่านและยอมรับ{" "}
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={handleViewTerms}
+                  style={{ padding: "0 4px" }}
+                >
+                  เงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว
+                </Button>
+              </Checkbox>
             </Form.Item>
 
             <Form.Item>
@@ -228,8 +270,10 @@ const Login = () => {
                 block
                 size="large"
                 style={{ height: 45 }}
+                disabled={!agreeTerms}
+                icon={<UserAddOutlined />}
               >
-                {loading ? <Spin /> : "เข้าสู่ระบบ"}
+                {loading ? <Spin /> : "สมัครสมาชิก"}
               </Button>
             </Form.Item>
           </Form>
@@ -238,16 +282,23 @@ const Login = () => {
             <Text type="secondary">หรือ</Text>
           </Divider>
 
-          <div style={{ textAlign: "center", marginBottom: 16 }}>
-            <Text>ยังไม่มีบัญชี? </Text>
-            <Link to="/register" style={{ fontWeight: "bold" }}>
-              สมัครสมาชิก
+          <div style={{ textAlign: "center" }}>
+            <Text>มีบัญชีอยู่แล้ว? </Text>
+            <Link to="/login" style={{ fontWeight: "bold" }}>
+              เข้าสู่ระบบ
             </Link>
           </div>
 
-          <div style={{ textAlign: "center", fontSize: "13px", color: "#888" }}>
+          <div
+            style={{
+              textAlign: "center",
+              fontSize: "13px",
+              color: "#888",
+              marginTop: "16px",
+            }}
+          >
             <div>
-              การเข้าใช้งานระบบถือว่าคุณยอมรับ{" "}
+              การสมัครสมาชิกถือว่าคุณยอมรับ{" "}
               <Button
                 type="link"
                 size="small"
@@ -266,16 +317,6 @@ const Login = () => {
                 <LockFilled /> นโยบายความเป็นส่วนตัว
               </Button>
             </div>
-            <div style={{ marginTop: 8 }}>
-              <Button
-                type="link"
-                size="small"
-                onClick={() => setShowTermsModal(true)}
-                style={{ padding: 0 }}
-              >
-                อ่านเงื่อนไขการใช้งาน
-              </Button>
-            </div>
           </div>
         </Card>
       </Content>
@@ -290,4 +331,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

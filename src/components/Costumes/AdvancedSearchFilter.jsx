@@ -1,7 +1,9 @@
 import React from "react";
-import { Collapse, Row, Col, Select, Typography, Grid } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Collapse, Select, Typography, Row, Col, Grid } from "antd";
+import PropTypes from "prop-types";
 
+const { Title } = Typography;
+const { Option } = Select;
 const { useBreakpoint } = Grid;
 
 /**
@@ -10,61 +12,71 @@ const { useBreakpoint } = Grid;
 const AdvancedSearchFilter = ({ onFilterChange }) => {
   const screens = useBreakpoint();
 
-  return (
-    <Collapse
-      bordered={false}
-      style={{ marginBottom: 16, background: "#f9f9f9" }}
-    >
-      <Collapse.Panel header="ค้นหาขั้นสูง" key="1" extra={<SearchOutlined />}>
+  const handleChange = (filterType, value) => {
+    onFilterChange(filterType, value);
+  };
+
+  // Define items for Collapse
+  const collapseItems = [
+    {
+      key: "1",
+      label: "ค้นหาขั้นสูง",
+      children: (
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={screens.md ? 8 : 12}>
-            <Typography.Text strong>ประเภทชุด</Typography.Text>
+          <Col xs={24} sm={8}>
+            <Title level={5}>ประเภทชุด</Title>
             <Select
-              placeholder="เลือกประเภท"
-              allowClear
-              onChange={(value) => onFilterChange({ categoryFilter: value })}
               style={{ width: "100%" }}
+              placeholder="เลือกประเภทชุด"
+              onChange={(value) => handleChange("category", value)}
+              allowClear
             >
-              <Select.Option value="0">กิโมโน</Select.Option>
-              <Select.Option value="1">ยูกาตะ</Select.Option>
-              <Select.Option value="2">คอสเพลย์</Select.Option>
+              <Option value="กิโมโน">กิโมโน</Option>
+              <Option value="ยูกาตะ">ยูกาตะ</Option>
+              <Option value="คอสเพลย์">คอสเพลย์</Option>
             </Select>
           </Col>
-
-          <Col xs={24} sm={screens.md ? 8 : 12}>
-            <Typography.Text strong>สถานะการให้บริการ</Typography.Text>
+          <Col xs={24} sm={8}>
+            <Title level={5}>สถานะการให้เช่า</Title>
             <Select
+              style={{ width: "100%" }}
               placeholder="เลือกสถานะ"
+              onChange={(value) => handleChange("rentalStatus", value)}
               allowClear
-              onChange={(value) =>
-                onFilterChange({
-                  isRentableFilter: value !== undefined ? Number(value) : null,
-                })
-              }
-              style={{ width: "100%" }}
             >
-              <Select.Option value={1}>ให้บริการ</Select.Option>
-              <Select.Option value={0}>ไม่ให้บริการ</Select.Option>
+              <Option value="available">พร้อมให้เช่า</Option>
+              <Option value="rented">กำลังถูกเช่า</Option>
+              <Option value="maintenance">อยู่ระหว่างซ่อมแซม</Option>
             </Select>
           </Col>
-
-          <Col xs={24} sm={screens.md ? 8 : 12}>
-            <Typography.Text strong>กลุ่มอายุ</Typography.Text>
+          <Col xs={24} sm={8}>
+            <Title level={5}>ช่วงอายุ</Title>
             <Select
-              placeholder="เลือกกลุ่มอายุ"
-              allowClear
-              onChange={(value) => onFilterChange({ ageGroupFilter: value })}
               style={{ width: "100%" }}
+              placeholder="เลือกช่วงอายุ"
+              onChange={(value) => handleChange("ageGroup", value)}
+              allowClear
             >
-              <Select.Option value="children">เด็ก</Select.Option>
-              <Select.Option value="adult">ผู้ใหญ่</Select.Option>
-              <Select.Option value="both">เด็กและผู้ใหญ่</Select.Option>
+              <Option value="children">เด็ก</Option>
+              <Option value="adult">ผู้ใหญ่</Option>
             </Select>
           </Col>
         </Row>
-      </Collapse.Panel>
-    </Collapse>
+      ),
+    },
+  ];
+
+  return (
+    <Collapse
+      items={collapseItems}
+      ghost
+      style={{ marginBottom: screens.xs ? 16 : 24 }}
+    />
   );
+};
+
+AdvancedSearchFilter.propTypes = {
+  onFilterChange: PropTypes.func.isRequired,
 };
 
 export default AdvancedSearchFilter;

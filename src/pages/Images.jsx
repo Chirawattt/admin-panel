@@ -48,7 +48,6 @@ dayjs.extend(relativeTime);
 
 const { Title } = Typography;
 const { useBreakpoint } = Grid;
-const { TabPane } = Tabs;
 
 const Images = () => {
   const screens = useBreakpoint();
@@ -63,13 +62,8 @@ const Images = () => {
   const [activeTab, setActiveTab] = useState("1");
 
   // Use the updated image filter hook
-  const {
-    sortOrder,
-    setSortOrder,
-    filteredImages,
-    resetFilters,
-    activeFilters,
-  } = useImageFilter(reviewImages);
+  const { sortOrder, setSortOrder, filteredImages, resetFilters } =
+    useImageFilter(reviewImages);
 
   useEffect(() => {
     fetchCostumes();
@@ -86,6 +80,7 @@ const Images = () => {
     } else {
       setReviewImages([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCostumeId]);
 
   const fetchCostumes = async () => {
@@ -192,9 +187,8 @@ const Images = () => {
   const renderFilters = () => (
     <SearchFilter
       sortOrder={sortOrder}
-      setSortOrder={setSortOrder}
-      resetFilters={resetFilters}
-      activeFilters={activeFilters}
+      onSortChange={(value) => setSortOrder(value)}
+      onReset={resetFilters}
     />
   );
 
@@ -240,6 +234,61 @@ const Images = () => {
       );
     }
   };
+
+  // สร้าง items สำหรับ Tabs component
+  const tabItems = [
+    {
+      key: "1",
+      label: (
+        <span>
+          <PictureOutlined /> จัดการรูปภาพ
+        </span>
+      ),
+      children: (
+        <>
+          <div style={{ marginBottom: 16 }}>
+            {!connectionError && (
+              <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+                <Col xs={24} md={12}>
+                  <CostumeSelector
+                    costumes={costumes}
+                    selectedCostumeId={selectedCostumeId}
+                    onChange={setSelectedCostumeId}
+                    loading={costumes.length === 0}
+                  />
+                </Col>
+              </Row>
+            )}
+          </div>
+
+          {selectedCostumeId && (
+            <>
+              <UploadSection
+                onUpload={handleUpload}
+                onRefresh={() => fetchReviewImages(selectedCostumeId)}
+                isDisabled={!selectedCostumeId}
+                isUploading={uploading}
+                isLoading={loading}
+                imagesCount={filteredImages.length}
+                uploadedCount={uploadedCount}
+              />
+
+              <div style={{ marginTop: 20 }}>{renderContent()}</div>
+            </>
+          )}
+        </>
+      ),
+    },
+    {
+      key: "2",
+      label: (
+        <span>
+          <FilterOutlined /> ดูรูปภาพตามชุด
+        </span>
+      ),
+      children: <div style={{ marginBottom: 24 }}>{renderContent()}</div>,
+    },
+  ];
 
   return (
     <Layout>
@@ -296,58 +345,8 @@ const Images = () => {
           defaultActiveKey="1"
           activeKey={activeTab}
           onChange={handleTabChange}
-        >
-          <TabPane
-            tab={
-              <span>
-                <PictureOutlined /> จัดการรูปภาพ
-              </span>
-            }
-            key="1"
-          >
-            <div style={{ marginBottom: 16 }}>
-              {!connectionError && (
-                <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-                  <Col xs={24} md={12}>
-                    <CostumeSelector
-                      costumes={costumes}
-                      selectedCostumeId={selectedCostumeId}
-                      onChange={setSelectedCostumeId}
-                      loading={costumes.length === 0}
-                    />
-                  </Col>
-                </Row>
-              )}
-            </div>
-
-            {selectedCostumeId && (
-              <>
-                <UploadSection
-                  onUpload={handleUpload}
-                  onRefresh={() => fetchReviewImages(selectedCostumeId)}
-                  isDisabled={!selectedCostumeId}
-                  isUploading={uploading}
-                  isLoading={loading}
-                  imagesCount={filteredImages.length}
-                  uploadedCount={uploadedCount}
-                />
-
-                <div style={{ marginTop: 20 }}>{renderContent()}</div>
-              </>
-            )}
-          </TabPane>
-
-          <TabPane
-            tab={
-              <span>
-                <FilterOutlined /> ดูรูปภาพตามชุด
-              </span>
-            }
-            key="2"
-          >
-            <div style={{ marginBottom: 24 }}>{renderContent()}</div>
-          </TabPane>
-        </Tabs>
+          items={tabItems}
+        />
       </Content>
     </Layout>
   );

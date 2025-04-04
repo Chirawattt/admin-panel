@@ -9,8 +9,10 @@ import {
   SkinOutlined,
   TagOutlined,
   MenuOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { isAdmin } from "../../api/authApi";
 import "./Navbar.css"; // Import CSS file for additional styles
 
 const { Header } = Layout;
@@ -24,19 +26,22 @@ const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const screens = useBreakpoint();
   const { token } = useToken();
+  const [userRole, setUserRole] = useState("user");
 
   const pathToKeyMap = {
     "/admin/costumes": "costumes",
     "/admin/costumes/status": "costume-status",
     "/admin/images": "images",
+    "/admin/users": "users",
   };
   const currentKey = pathToKeyMap[location.pathname] || "costumes";
 
   const handleLogout = async () => {
     try {
-      localStorage.clear(); // ลบข้อมูลใน localStorage ทั้งหมด
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       toast.success("ออกจากระบบสำเร็จ!"); // toast แจ้งเตือน
-      navigate("/"); // ไปหน้า Login
+      navigate("/login"); // ไปหน้า Login
     } catch {
       toast.error("เกิดข้อผิดพลาดในการออกจากระบบ");
     }
@@ -45,13 +50,22 @@ const Navbar = () => {
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       toast.error("โปรดเข้าสู่ระบบก่อนใช้งาน");
-      navigate("/");
+      navigate("/login");
+      return;
     }
-    localStorage.getItem("username") &&
-      setUserState({ username: localStorage.getItem("username") });
+
+    if (localStorage.getItem("user")) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      setUserState({
+        username: user.username,
+        userRole: user.userRole,
+      });
+      setUserRole(user.userRole || "user");
+    }
   }, [navigate]);
 
-  const menuItems = [
+  // เมนูทั่วไปสำหรับทุก role
+  const commonMenuItems = [
     {
       key: "costumes",
       icon: <SkinOutlined />,
@@ -68,6 +82,20 @@ const Navbar = () => {
       label: <Link to="/admin/images">จัดการรูปภาพ</Link>,
     },
   ];
+
+  // เมนูสำหรับ admin เท่านั้น
+  const adminMenuItems = [
+    {
+      key: "users",
+      icon: <TeamOutlined />,
+      label: <Link to="/admin/users">จัดการบัญชีผู้ใช้</Link>,
+    },
+  ];
+
+  // รวมเมนูตาม role
+  const menuItems = isAdmin()
+    ? [...commonMenuItems, ...adminMenuItems]
+    : commonMenuItems;
 
   return (
     <Header
@@ -151,7 +179,14 @@ const Navbar = () => {
           items: [
             {
               key: "profile",
-              label: `สวัสดี ${userState.username || "ผู้ใช้"}`,
+              label: (
+                <div>
+                  <div>{`สวัสดี ${userState.username || "ผู้ใช้"}`}</div>
+                  <div style={{ color: "#999", fontSize: "0.8em" }}>
+                    {userRole === "admin" ? "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
+                  </div>
+                </div>
+              ),
               icon: <UserOutlined />,
               disabled: true,
             },
@@ -181,6 +216,8 @@ const Navbar = () => {
             fontWeight: "bold",
             display: "flex",
             alignItems: "center",
+            padding: screens.xs ? "4px 8px" : "4px 12px",
+            height: screens.xs ? "32px" : "36px",
           }}
         >
           {screens.sm ? userState.username : null}
@@ -202,8 +239,8 @@ const Navbar = () => {
         placement="left"
         onClose={() => setIsDrawerOpen(false)}
         open={isDrawerOpen}
-        width={screens.xs ? "80%" : 300}
-        bodyStyle={{ padding: 0 }}
+        width={screens.xs ? "85%" : 300}
+        styles={{ body: { padding: 0 } }}
         className="navbar-drawer"
       >
         <div
@@ -237,7 +274,7 @@ const Navbar = () => {
                 {userState.username || "ผู้ใช้"}
               </div>
               <div style={{ fontSize: 12, color: "rgba(0, 0, 0, 0.45)" }}>
-                เข้าสู่ระบบเรียบร้อยแล้ว
+                {userRole === "admin" ? "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
               </div>
             </div>
 

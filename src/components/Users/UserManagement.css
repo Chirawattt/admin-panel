@@ -1,0 +1,134 @@
+/* UserManagement.css */
+
+/* สไตล์สำหรับหน้าจัดการผู้ใช้งาน */
+.user-management-container {
+  transition: all 0.3s ease;
+}
+
+.user-management-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.user-management-title {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-management-header {
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+/* สไตล์สำหรับตาราง */
+.user-table .ant-table-cell {
+  padding: 12px 16px;
+}
+
+.user-table .ant-table-thead > tr > th {
+  background-color: #f5f7fa;
+  font-weight: 600;
+}
+
+/* สไตล์สำหรับช่องค้นหา */
+.user-search-input {
+  transition: all 0.3s ease;
+}
+
+.user-search-input:hover {
+  border-color: #1890ff;
+}
+
+/* สไตล์สำหรับการแสดงข้อมูลติดต่อ */
+.user-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+}
+
+.user-phone-icon {
+  color: #1890ff;
+  font-size: 14px;
+}
+
+/* สไตล์สำหรับ Tag แสดงสถานะ */
+.user-role-tag {
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.admin-role-tag {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.user-role-tag {
+  background-color: #1890ff;
+  color: white;
+}
+
+/* Animation effects */
+.user-management-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .user-management-title {
+    font-size: 18px;
+  }
+
+  .user-table .ant-table-cell {
+    padding: 8px 12px;
+  }
+
+  .user-action-buttons .ant-btn {
+    min-width: 32px;
+    padding: 0 8px;
+    height: 28px;
+  }
+
+  .user-contact-info {
+    font-size: 12px;
+  }
+}
+
+/* สไตล์สำหรับการแสดงผลรายการว่าง */
+.user-table-empty {
+  padding: 32px 0;
+  text-align: center;
+}
+
+.user-table-empty .anticon {
+  font-size: 48px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+}
+
+/* สไตล์สำหรับการโหลด */
+.user-table-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+/* Animation for row hover */
+.user-table .ant-table-tbody > tr:hover > td {
+  background-color: rgba(24, 144, 255, 0.05);
+}

@@ -1,72 +1,53 @@
 import React from "react";
-import { Collapse, Space, Typography, Radio, Button, Flex } from "antd";
-import { SortAscendingOutlined, FilterOutlined } from "@ant-design/icons";
+import { Collapse, Radio, Typography, Space } from "antd";
 import "./SearchFilter.css";
+import PropTypes from "prop-types";
 
-const { Text } = Typography;
+const { Title } = Typography;
 
 /**
- * Component สำหรับแสดงตัวเรียงลำดับรูปภาพรีวิว
+ * Component สำหรับแสดงตัวกรองการค้นหารูปภาพ
  */
-const SearchFilter = ({
-  sortOrder,
-  setSortOrder,
-  resetFilters,
-  activeFilters,
-}) => {
-  // Filter header with active filter count badge
-  const filterHeader = (
-    <div className="filter-header">
-      <FilterOutlined style={{ marginRight: 8 }} />
-      <span>เรียงลำดับรูปภาพ</span>
-      {activeFilters > 0 && (
-        <span className="filter-badge">{activeFilters}</span>
-      )}
-    </div>
-  );
+const SearchFilter = ({ sortOrder, onSortChange, onReset }) => {
+  // Define items for Collapse
+  const collapseItems = [
+    {
+      key: "1",
+      label: "เรียงลำดับรูปภาพ",
+      children: (
+        <div className="search-filter-content">
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Title level={5}>เรียงตามวันที่อัปโหลด</Title>
+            <Radio.Group
+              onChange={(e) => onSortChange(e.target.value)}
+              value={sortOrder}
+              style={{ marginBottom: 16 }}
+            >
+              <Space direction="vertical">
+                <Radio value="newest">ล่าสุด - เก่าสุด</Radio>
+                <Radio value="oldest">เก่าสุด - ล่าสุด</Radio>
+              </Space>
+            </Radio.Group>
+            <div className="search-filter-reset">
+              <a onClick={onReset}>คืนค่าเริ่มต้น</a>
+            </div>
+          </Space>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="image-search-filter">
-      <Collapse
-        className="filter-collapse"
-        expandIconPosition="end"
-        defaultActiveKey={["1"]}
-      >
-        <Collapse.Panel header={filterHeader} key="1">
-          <Space
-            direction="vertical"
-            className="filter-section"
-            style={{ width: "100%" }}
-          >
-            {/* Date sort options */}
-            <div>
-              <Text strong className="filter-label">
-                <SortAscendingOutlined /> เรียงตามวันที่อัปโหลด
-              </Text>
-              <div className="sort-options">
-                <Radio.Group
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
-                  buttonStyle="solid"
-                  optionType="button"
-                >
-                  <Radio.Button value="newest">ล่าสุด</Radio.Button>
-                  <Radio.Button value="oldest">เก่าสุด</Radio.Button>
-                </Radio.Group>
-              </div>
-            </div>
-
-            {/* Reset filters */}
-            <Flex justify="flex-end">
-              <Button type="link" onClick={resetFilters}>
-                คืนค่าเริ่มต้น
-              </Button>
-            </Flex>
-          </Space>
-        </Collapse.Panel>
-      </Collapse>
+    <div className="search-filter-container">
+      <Collapse items={collapseItems} defaultActiveKey={["1"]} ghost />
     </div>
   );
+};
+
+SearchFilter.propTypes = {
+  sortOrder: PropTypes.string.isRequired,
+  onSortChange: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
 };
 
 export default SearchFilter;

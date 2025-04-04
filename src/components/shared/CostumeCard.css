@@ -27,11 +27,21 @@
 }
 
 .costume-card.available {
-  background-color: rgba(173, 255, 211, 0.7);
+  background-color: rgba(236, 249, 243, 1);
+  border: 1px solid rgba(82, 196, 26, 0.3);
 }
 
 .costume-card.unavailable {
-  background-color: rgba(252, 181, 167, 0.7);
+  background-color: rgba(255, 241, 240, 1);
+  border: 1px solid rgba(255, 77, 79, 0.3);
+}
+
+.costume-card.available .costume-card-content {
+  background-color: inherit;
+}
+
+.costume-card.unavailable .costume-card-content {
+  background-color: inherit;
 }
 
 .costume-card-status {
