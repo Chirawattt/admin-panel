@@ -150,9 +150,10 @@ const Navbar = () => {
               fontWeight: "bold",
               fontSize: screens.md ? 18 : 16,
               display: screens.xs ? "none" : "inline-block",
+              whiteSpace: "nowrap",
             }}
           >
-            Moso Yodia
+            Moso-Yodia
           </span>
         )}
       </div>
@@ -233,7 +234,7 @@ const Navbar = () => {
               alt="Logo"
               style={{ width: 40, height: 40, borderRadius: "50%" }}
             />
-            <span>Moso Yodia</span>
+            <span style={{ whiteSpace: "nowrap" }}>Moso-Yodia</span>
           </div>
         }
         placement="left"

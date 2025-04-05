@@ -18,6 +18,10 @@
 .navbar-title {
   color: #1890ff;
   transition: color 0.3s ease;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .navbar-mobile-button {
@@ -79,6 +83,11 @@
     padding: 4px 8px;
     min-width: 40px;
   }
+
+  .navbar-title {
+    font-size: 16px !important;
+    margin-left: 8px !important;
+  }
 }
 
 @media (max-width: 576px) {
@@ -89,6 +98,16 @@
   .navbar-drawer-menu .ant-menu-item {
     height: 45px;
     line-height: 45px;
+  }
+
+  .navbar-header {
+    padding: 0 10px !important;
+    height: 60px !important;
+  }
+
+  .navbar-logo {
+    width: 40px !important;
+    height: 40px !important;
   }
 }
 
@@ -118,4 +137,13 @@
 .navbar-drawer-menu .ant-menu-item-selected {
   color: #1890ff;
   font-weight: 500;
+}
+
+.navbar-menu {
+  font-weight: 500;
+}
+
+.navbar-drawer-menu .ant-menu-item {
+  height: 48px;
+  line-height: 48px;
 }
