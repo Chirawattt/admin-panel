@@ -91,12 +91,12 @@ const Images = () => {
     } catch (err) {
       console.error("Error fetching costumes:", err);
       message.error("ไม่สามารถโหลดชุดได้");
-      if (err.message.includes("Network Error") || !err.response) {
+      if (err.includes("Network Error") || !err.response) {
         setConnectionError(
           "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่อหรือเซิร์ฟเวอร์"
         );
       } else {
-        setConnectionError(`เกิดข้อผิดพลาด: ${err.message}`);
+        setConnectionError(`เกิดข้อผิดพลาด: ${err}`);
       }
     }
   };
@@ -110,12 +110,12 @@ const Images = () => {
     } catch (err) {
       console.error("Error fetching review images:", err);
       message.error("ไม่สามารถโหลดรูปภาพรีวิวได้");
-      if (err.message.includes("Network Error") || !err.response) {
+      if (err.includes("Network Error") || !err.response) {
         setConnectionError(
           "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่อหรือเซิร์ฟเวอร์"
         );
       } else {
-        setConnectionError(`เกิดข้อผิดพลาด: ${err.message}`);
+        setConnectionError(`เกิดข้อผิดพลาด: ${err}`);
       }
     }
     setLoading(false);

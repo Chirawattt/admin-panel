@@ -41,7 +41,7 @@ const useCostumeActions = (queryClient) => {
           toast.success("ลบชุดสำเร็จ!");
           queryClient.invalidateQueries({ queryKey: ["costumes"] });
         } catch (error) {
-          console.error("❌ เกิดข้อผิดพลาด:", error);
+          console.error("เกิดข้อผิดพลาด:", error);
           toast.error("เกิดข้อผิดพลาดในการลบชุด");
         }
       },

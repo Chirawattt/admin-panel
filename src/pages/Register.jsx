@@ -85,8 +85,8 @@ const Register = () => {
       toast.success("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
       navigate("/login");
     } catch (error) {
-      setError(error.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
-      toast.error(error.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+      setError(error);
+      toast.error(error);
     }
     setLoading(false);
   };
