@@ -2,6 +2,10 @@ import api from "./axiosConfig";
 
 // นำเข้าหรือกำหนดค่า IMAGE_BASE_URL เช่นเดียวกับที่ใช้ใน ImageApi.js
 const getImageBaseUrl = () => {
+  // ถ้ามี environment variable ให้ใช้ค่าจาก environment
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
   // ถ้ารันบน localhost แสดงว่าเป็น development environment
   if (window.location.hostname === "localhost") {
     return "http://localhost:5000";

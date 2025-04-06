@@ -1,8 +1,11 @@
 import api from "./axiosConfig";
 
-// กำหนดค่า baseURL สำหรับรูปภาพ - ปรับให้ใช้ค่าจาก window.location.origin ถ้าเป็น production
-// หรือใช้ localhost:5000 ถ้าเป็น development
+// กำหนดค่า baseURL สำหรับรูปภาพ - ใช้ค่าจาก environment variable สำหรับ production
 const getImageBaseUrl = () => {
+  // ถ้ามี environment variable ให้ใช้ค่าจาก environment
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
   // ถ้ารันบน localhost แสดงว่าเป็น development environment
   if (window.location.hostname === "localhost") {
     return "http://localhost:5000";

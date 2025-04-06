@@ -3,8 +3,12 @@ import { toast } from "react-toastify";
 
 // กำหนดค่า baseURL สำหรับ API ให้เป็น path ที่ถูกต้อง
 // สำหรับ development environment ใช้ http://localhost:5000/api
-// สำหรับ production environment ใช้ [origin]/api
+// ใช้ environment variable จาก .env file สำหรับ production
 const getBaseUrl = () => {
+  // ถ้ามี environment variable ให้ใช้ค่าจาก environment
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
+  }
   // ถ้ารันบน localhost แสดงว่าเป็น development environment
   if (window.location.hostname === "localhost") {
     return "http://localhost:5000/api";
