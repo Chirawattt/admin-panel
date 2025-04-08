@@ -1,7 +1,10 @@
 import React from "react";
 import { Image, Popconfirm, Button, Typography, Tooltip } from "antd";
 import { DeleteOutlined, PictureOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
+import {
+  formatThaiRelativeTime,
+  formatFullThaiDate,
+} from "../../utils/dateUtils";
 
 const { Text } = Typography;
 
@@ -114,8 +117,17 @@ const ImageCard = ({ img, onDelete }) => {
           </Text>
         </Tooltip>
         <Text type="secondary" style={{ fontSize: 12 }}>
-          อัปโหลดเมื่อ: {dayjs(img?.createdAt).fromNow()}
+          อัปโหลดเมื่อ: {formatThaiRelativeTime(img?.createdAt)}
         </Text>
+        {img?.createdAt && (
+          <>
+            <Tooltip title={formatFullThaiDate(img.createdAt)}>
+              <Text type="secondary" style={{ fontSize: 12, display: "block" }}>
+                เวลา: {formatFullThaiDate(img.createdAt)}
+              </Text>
+            </Tooltip>
+          </>
+        )}
       </div>
 
       <Popconfirm

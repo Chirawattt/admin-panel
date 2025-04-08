@@ -17,7 +17,10 @@ import {
   InboxOutlined,
   ZoomInOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
+import {
+  formatThaiRelativeTime,
+  formatFullThaiDate,
+} from "../../utils/dateUtils";
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -233,17 +236,12 @@ const CostumeFormModal = ({
         <div style={{ marginTop: 20, fontSize: 12, color: "#888" }}>
           <p>
             <b>สร้างเมื่อ:</b>{" "}
-            {dayjs(costumeState.editCostume.createdAt).format(
-              "D MMMM YYYY เวลา HH:mm น."
-            )}
+            {formatFullThaiDate(costumeState.editCostume.createdAt)}
           </p>
           <p>
             <b>อัปเดตล่าสุด:</b>{" "}
-            {dayjs(costumeState.editCostume.updatedAt).fromNow()} (
-            {dayjs(costumeState.editCostume.updatedAt).format(
-              "D MMMM YYYY เวลา HH:mm น."
-            )}
-            )
+            {formatThaiRelativeTime(costumeState.editCostume.updatedAt)} (
+            {formatFullThaiDate(costumeState.editCostume.updatedAt)})
           </p>
         </div>
       )}

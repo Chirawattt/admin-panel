@@ -5,13 +5,10 @@ import { ToastContainer } from "react-toastify";
 import "antd/dist/reset.css"; // Reset CSS for Ant Design
 import "antd/dist/antd.min.js"; // JS for Ant Design
 import "./index.css"; // Custom CSS
-
-// เปลี่ยนเวลาให้เป็นภาษาไทย
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/th";
+import "dayjs/locale/th"; // เพื่อให้ใช้ภาษาไทยได้
 
-dayjs.extend(relativeTime);
+// ตั้งค่าให้ dayjs ใช้ภาษาไทยในแอปทั้งหมด
 dayjs.locale("th");
 
 const queryClient = new QueryClient();

@@ -30,10 +30,16 @@ const useCostumeData = () => {
   });
 
   // โหลดข้อมูลทั้งหมดแล้วทำ pagination ที่ client
-  const { data, isLoading, refetch } = useQuery({
+  const {
+    data,
+    isLoading,
+    refetch: reactQueryRefetch,
+  } = useQuery({
     queryKey: ["costumes", sorter, filterState],
     queryFn: async () => {
+      console.log("Fetching costumes data...");
       const allData = await FetchCostumes();
+      console.log("Received costumes data:", allData.length);
       const filteredData = allData.filter(
         (costume) =>
           costume.name
@@ -66,7 +72,18 @@ const useCostumeData = () => {
         total: filteredData.length,
       };
     },
+    staleTime: 30000, // 30 วินาที
+    cacheTime: 300000, // 5 นาที
   });
+
+  // ฟังก์ชัน refetch ที่จะล้างแคชและบังคับโหลดข้อมูลใหม่
+  const refetch = async () => {
+    console.log("Forcing refetch of costumes data...");
+    // ล้างแคชก่อน
+    await queryClient.invalidateQueries(["costumes"]);
+    // แล้วโหลดข้อมูลใหม่
+    return await reactQueryRefetch();
+  };
 
   // ข้อมูลที่แสดงในหน้าปัจจุบัน
   const paginatedData = useMemo(() => {

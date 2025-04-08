@@ -1,8 +1,10 @@
 import React from "react";
-import { Modal, Button, Row, Col, Typography, Tag, Grid } from "antd";
-import dayjs from "dayjs";
+import { Modal, Button, Row, Col, Typography, Grid } from "antd";
+import {
+  formatThaiRelativeTime,
+  formatFullThaiDate,
+} from "../../utils/dateUtils";
 
-const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
 /**
@@ -92,10 +94,10 @@ const CostumeDetail = ({
         )}
         <Col xs={24}>
           <Typography.Text type="secondary" style={{ fontSize: "13px" }}>
-            <div>อัปเดตสถานะล่าสุด: {dayjs(costume.updatedAt).fromNow()}</div>
             <div>
-              {dayjs(costume.updatedAt).format("D MMMM YYYY เวลา HH:mm น.")}
+              อัปเดตสถานะล่าสุด: {formatThaiRelativeTime(costume.updatedAt)}
             </div>
+            <div>{formatFullThaiDate(costume.updatedAt)}</div>
           </Typography.Text>
         </Col>
       </Row>

@@ -1,4 +1,4 @@
-import { Layout, Form, Grid } from "antd";
+import { Layout, Form, Grid, message } from "antd";
 import Navbar from "../components/shared/Navbar";
 import CostumeFormModal from "../components/Costumes/CostumeFormModal";
 import useCostumeForm from "../hooks/Costumes/useCostumeForm";
@@ -9,6 +9,7 @@ import PageHeader from "../components/shared/PageHeader";
 import SearchBar from "../components/Costumes/SearchBar";
 import AdvancedSearchFilter from "../components/Costumes/AdvancedSearchFilter";
 import CostumeTable from "../components/Costumes/CostumeTable";
+import { useState } from "react";
 
 const { Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -16,6 +17,7 @@ const { useBreakpoint } = Grid;
 const Costumes = () => {
   const screens = useBreakpoint();
   const [form] = Form.useForm();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Custom hooks
   const {
@@ -47,6 +49,20 @@ const Costumes = () => {
     onFinish(values, costumeState);
   };
 
+  // ฟังก์ชันสำหรับการรีเฟรชที่ชัดเจนและแสดง feedback
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+      message.success("รีเฟรชข้อมูลเรียบร้อย");
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      message.error("เกิดข้อผิดพลาดในการรีเฟรชข้อมูล");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <Layout>
       {/* Navbar ด้านบน */}
@@ -66,8 +82,8 @@ const Costumes = () => {
         {/* ส่วนหัวของหน้า */}
         <PageHeader
           title="จัดการชุด"
-          onRefresh={refetch}
-          loading={isLoading}
+          onRefresh={handleRefresh}
+          loading={isLoading || refreshing}
           onAddNew={() => openModal(null)}
         />
 

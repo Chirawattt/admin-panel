@@ -2,12 +2,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // กำหนดค่า baseURL สำหรับ API ให้เป็น path ที่ถูกต้อง
-// สำหรับ development environment ใช้ http://localhost:5000/api
 // ใช้ environment variable จาก .env file สำหรับ production
 const getBaseUrl = () => {
   // ถ้ามี environment variable ให้ใช้ค่าจาก environment
   if (import.meta.env.VITE_API_URL) {
-    return `${import.meta.env.VITE_API_URL}/api`;
+    const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
+    return baseUrl;
   }
   // ถ้ารันบน localhost แสดงว่าเป็น development environment
   if (window.location.hostname === "localhost") {
@@ -17,9 +17,12 @@ const getBaseUrl = () => {
   return `${window.location.origin}/api`;
 };
 
+const baseURL = getBaseUrl();
+
 // สร้าง instance ของ axios ที่มี baseURL ตามที่เรากำหนด
 const api = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL,
+  timeout: 10000, // เพิ่ม timeout 10 วินาที
 });
 
 // Interceptor แนบ Token ในทุก Request ที่ส่งไปยัง Server
