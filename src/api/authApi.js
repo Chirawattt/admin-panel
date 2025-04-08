@@ -6,11 +6,7 @@ import api from "./axiosConfig";
  */
 export const login = async (credentials) => {
   try {
-    console.log("Attempting login with API URL:", api.defaults.baseURL);
-    console.log("Credentials:", { ...credentials, password: "********" });
-
     const response = await api.post("/auth/login", credentials);
-    console.log("Login response:", response.data);
 
     const { token, user } = response.data;
     localStorage.setItem("token", token);
@@ -26,20 +22,14 @@ export const login = async (credentials) => {
 
     return response.data;
   } catch (error) {
-    console.error("Login error:", error);
-
     if (error.response) {
-      console.error("Error response data:", error.response.data);
-      console.error("Error response status:", error.response.status);
       throw (
         error.response.data.error ||
         "การเข้าสู่ระบบล้มเหลว กรุณาลองใหม่อีกครั้ง"
       );
     } else if (error.request) {
-      console.error("No response received:", error.request);
       throw "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต";
     } else {
-      console.error("Error setting up request:", error.message);
       throw "เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง";
     }
   }

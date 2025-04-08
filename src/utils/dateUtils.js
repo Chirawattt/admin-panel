@@ -66,10 +66,10 @@ export const formatFullThaiDate = (date, useBuddhistEra = false) => {
 };
 
 /**
- * แปลงเวลาให้แสดงในรูปแบบไทย ทั้งวันและเวลา
+ * แปลงเวลาให้แสดงเฉพาะวัน เดือน ปี
  * @param {string|Date} date - วันที่ที่ได้จาก API
  * @param {boolean} useBuddhistEra - แสดงปีเป็นพุทธศักราชหรือไม่ (default: false)
- * @returns {string} วันที่และเวลาในรูปแบบไทย
+ * @returns {string} วันเดือนปีในรูปแบบไทย
  */
 export const formatThaiDateOnly = (date, useBuddhistEra = false) => {
   if (!date) return null;

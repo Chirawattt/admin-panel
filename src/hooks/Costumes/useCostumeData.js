@@ -37,9 +37,7 @@ const useCostumeData = () => {
   } = useQuery({
     queryKey: ["costumes", sorter, filterState],
     queryFn: async () => {
-      console.log("Fetching costumes data...");
       const allData = await FetchCostumes();
-      console.log("Received costumes data:", allData.length);
       const filteredData = allData.filter(
         (costume) =>
           costume.name
@@ -78,7 +76,6 @@ const useCostumeData = () => {
 
   // ฟังก์ชัน refetch ที่จะล้างแคชและบังคับโหลดข้อมูลใหม่
   const refetch = async () => {
-    console.log("Forcing refetch of costumes data...");
     // ล้างแคชก่อน
     await queryClient.invalidateQueries(["costumes"]);
     // แล้วโหลดข้อมูลใหม่

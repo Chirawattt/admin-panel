@@ -120,13 +120,11 @@ const ImageCard = ({ img, onDelete }) => {
           อัปโหลดเมื่อ: {formatThaiRelativeTime(img?.createdAt)}
         </Text>
         {img?.createdAt && (
-          <>
-            <Tooltip title={formatFullThaiDate(img.createdAt)}>
-              <Text type="secondary" style={{ fontSize: 12, display: "block" }}>
-                เวลา: {formatFullThaiDate(img.createdAt)}
-              </Text>
-            </Tooltip>
-          </>
+          <Tooltip title={formatFullThaiDate(img.createdAt)}>
+            <Text type="secondary" style={{ fontSize: 12, display: "block" }}>
+              เวลา: {formatFullThaiDate(img.createdAt)}
+            </Text>
+          </Tooltip>
         )}
       </div>
 
